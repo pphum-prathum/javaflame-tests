@@ -1,4 +1,4 @@
-# ITCS473 – Project Assignment 1 – ShuperShine
+# Javaflame Test Suites
 
 ## Team
 -  Saruta Nakro
