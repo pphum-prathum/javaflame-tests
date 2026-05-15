@@ -1,0 +1,195 @@
+// Define the Java versions you want to build for
+def javaVersions = [8, 11, 21]
+
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+
+// to build call ./gradlew --console=plain clean jar8 jar11 jar21
+// to publish call gradle jar8 jar11 jar21 publish
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'net.bytebuddy:byte-buddy:1.14.6'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+    testImplementation 'org.skyscreamer:jsonassert:1.5.1'
+    testImplementation "org.junit.jupiter:junit-jupiter-params"
+}
+
+println "Registering tasks for ${javaVersions}"
+
+javadoc.options.addStringOption('Xdoclint:none', '-quiet')
+
+
+test {
+    useJUnitPlatform()
+    // Show standard output and standard error of the test.
+    testLogging {
+        events "passed", "skipped", "failed"
+        showStandardStreams = true
+
+        // Optionally, include more details on failures
+        exceptionFormat = 'full'  // Options: 'full', 'short'
+    }
+
+    // Gradle often suppresses output; this will always show it on console
+    testLogging {
+        showExceptions true
+        showCauses true
+        showStackTraces true
+    }
+
+    // Force all output to be shown immediately
+    outputs.upToDateWhen { false }
+}
+
+javaVersions.each { javaVersion ->
+    def compileTaskName = "compileJava${javaVersion}"
+    def processResourcesTaskName = "processResources${javaVersion}"
+    def classesDir = file("$buildDir/classes/java${javaVersion}/main")
+    def resourcesDir = file("$buildDir/resources/java${javaVersion}/main")
+    def jarTaskName = "jar${javaVersion}"
+    def classesTaskName = "classes${javaVersion}"
+    def javaDocTaskName = "javadoc${javaVersion}"
+    def sourcesJavaTaskName="sources${javaVersion}"
+    def testTaskName = "test${javaVersion}"
+
+    // Determine the compiler version to use
+    def compilerVersion = javaVersion >= 9 ? javaVersion : 11 // Use at least Java 11 compiler
+
+    // Sources JAR task
+    tasks.register(sourcesJavaTaskName, Jar) {
+        archiveClassifier.set("sources-java${javaVersion}")
+        from sourceSets.main.allSource
+    }
+
+    // Javadoc JAR task
+    tasks.register(javaDocTaskName, Jar) {
+        archiveClassifier.set("javadoc-java${javaVersion}")
+        from tasks.javadoc
+    }
+
+    // Custom compile task for the specified Java version
+    tasks.register(compileTaskName, JavaCompile) {
+        source = sourceSets.main.java
+        classpath = sourceSets.main.compileClasspath
+        destinationDirectory = classesDir
+        options.encoding = 'UTF-8'
+        options.release = javaVersion
+        javaCompiler = javaToolchains.compilerFor {
+            languageVersion = JavaLanguageVersion.of(compilerVersion)
+        }
+    }
+
+    // Custom processResources task for the specified Java version
+    tasks.register(processResourcesTaskName, Copy) {
+        from sourceSets.main.resources
+        into resourcesDir
+    }
+
+    // Custom classes task that depends on compile and processResources
+    tasks.register(classesTaskName) {
+        dependsOn compileTaskName, processResourcesTaskName
+    }
+
+    // Custom JAR task for the specified Java version
+    tasks.register(jarTaskName, Jar) {
+        dependsOn tasks.named(classesTaskName)
+        archiveClassifier.set("java${javaVersion}")
+        from classesDir
+        from resourcesDir
+        // Include dependencies in the JAR
+        from {
+            configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+        }
+        manifest {
+            attributes "Main-Class": "com.github.beothorn.agent.MethodInstrumentationAgent"
+            attributes "Agent-Class": "com.github.beothorn.agent.MethodInstrumentationAgent"
+            attributes "Premain-Class": "com.github.beothorn.agent.MethodInstrumentationAgent"
+            attributes "Can-Redefine-Classes": "true"
+            attributes "Can-Retransform-Classes": "true"
+        }
+    }
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            javaVersions.each { javaVersion ->
+                def publicationName = "maven${javaVersion}"
+                def jarTaskName = "jar${javaVersion}"
+
+                // Create a publication for each Java version
+                create(publicationName, MavenPublication) {
+                    groupId = 'com.github.beothorn'
+                    artifactId = 'javaFlame'
+                    version = '27.1.0'
+
+                    // Include the custom JAR
+                    artifact(tasks.named(jarTaskName).get()) {
+                        classifier = "java${javaVersion}"
+                    }
+
+                    // Include sources and Javadoc JARs
+                    artifact(tasks.named("sources${javaVersion}").get()) {
+                        classifier = "sources-java${javaVersion}"
+                    }
+                    artifact(tasks.named("javadoc${javaVersion}").get()) {
+                        classifier = "javadoc-java${javaVersion}"
+                    }
+
+                    // POM configuration
+                    pom {
+                        name = 'Javaflame'
+                        description = 'An agent that creates reports for function calls with argument and return values.'
+                        url = 'https://github.com/beothorn/javaflame'
+                        licenses {
+                            license {
+                                name = 'The Apache License, Version 2.0'
+                                url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                            }
+                        }
+                        developers {
+                            developer {
+                                id = 'beothorn'
+                                name = 'Lucas S'
+                                email = 'lucass@gmail.com'
+                            }
+                        }
+                        scm {
+                            connection = 'scm:git:git@github.com:beothorn/javaflame.git'
+                            developerConnection = 'scm:git:ssh://git@github.com/beothorn/javaflame.git'
+                            url = 'https://github.com/beothorn/javaflame'
+                        }
+                    }
+                }
+            }
+        }
+
+        repositories {
+            maven {
+                name = 'OSSRH'
+                url = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+
+                // Only set credentials if they are present
+                if (project.hasProperty('ossrhUsername') && project.hasProperty('ossrhPassword')) {
+                    credentials {
+                        username = project.ossrhUsername
+                        password = project.ossrhPassword
+                    }
+                }
+            }
+        }
+    }
+
+    signing {
+        javaVersions.each { javaVersion ->
+            def publicationName = "maven${javaVersion}"
+            sign publishing.publications[publicationName]
+        }
+    }
+}

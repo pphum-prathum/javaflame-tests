@@ -1,0 +1,269 @@
+:root {
+    --background-theme: #f4f4f4;
+    --color-theme: #333333;
+    --box-background-theme: #ffffff;
+    --tooltip-background-theme: #f0f0f0;
+    --tooltip-color-theme: #333333;
+    --tooltip-border-theme: #333333;
+    --input-background-theme: #007bff;
+    --input-color-theme: #ffffff;
+    --input-placeholder-color-theme: #7db8ff;
+    --notSelectedButton-background-theme: #007bff;
+    --selectedButton-background-theme: #395068;
+    --link-color-theme: #007bff;
+    --flamegraph-background-theme: #ffffff;
+    --title-color-theme: #007bff;
+    --top-button-color-theme: #ffffff;
+    --caret-color-theme: black;
+}
+
+.light-theme {
+    --background-theme: #f4f4f4;
+    --color-theme: #333333;
+    --box-background-theme: #ffffff;
+    --tooltip-background-theme: #f0f0f0;
+    --tooltip-color-theme: #333333;
+    --tooltip-border-theme: #333333;
+    --input-background-theme: #007bff;
+    --input-color-theme: #ffffff;
+    --input-placeholder-color-theme: #7db8ff;
+    --notSelectedButton-background-theme: #007bff;
+    --selectedButton-background-theme: #395068;
+    --link-color-theme: #007bff;
+    --flamegraph-background-theme: #ffffff;
+    --title-color-theme: #007bff;
+    --top-button-color-theme: #ffffff;
+    --caret-color-theme: black;
+}
+
+.dark-theme {
+    --background-theme: #1a1a1a;
+    --color-theme: #e6e6e6;
+    --box-background-theme: #2e2e2e;
+    --tooltip-background-theme: #4a525e;
+    --tooltip-color-theme: #abb2bf;
+    --tooltip-border-theme: #fff;
+    --input-background-theme: #4a525e;
+    --input-color-theme: #abb2bf;
+    --input-placeholder-color-theme: #666;
+    --notSelectedButton-background-theme: #c70039;
+    --selectedButton-background-theme: #f94c10;
+    --link-color-theme: #f94c10;
+    --flamegraph-background-theme: #2e2e2e;
+    --title-color-theme: #f94c10;
+    --top-button-color-theme: #1a1a1a;
+    --caret-color-theme: white;
+}
+
+body {
+    background-color: var(--background-theme);
+    color: var(--color-theme);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.box {
+    background-color: var(--box-background-theme);
+    border-radius: 8px;
+    padding: 20px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+#header {
+    display: flex;
+}
+
+.boxHeader{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.headerLeft, .headerRight {
+    display: flex;
+    align-items: center;
+}
+
+.headerLeft{
+    justify-content: flex-start;
+    flex-grow: 1;
+}
+
+.headerRight{
+    justify-content: flex-end;
+}
+
+#searchLeft{
+    justify-content: flex-start;
+}
+
+#searchRight{
+    justify-content: flex-end;
+    flex-grow: 1;
+}
+
+#searchInputWithButton {
+    display: flex;
+    align-items: center;
+    margin-left: 1rem;
+    width: 100%;
+}
+
+#searchButton{
+    background-color: var(--notSelectedButton-background-theme);
+}
+
+#logo {
+    margin-right: 20px;
+}
+
+#metadata {
+    flex-grow: 1;
+}
+
+p {
+    margin: 8px 0;
+}
+
+a {
+    color: var(--link-color-theme);
+}
+
+.container {
+    margin-top: 10px;
+}
+
+.tooltip {
+    background-color: var(--tooltip-background-theme);
+    color: var(--tooltip-color-theme);
+    padding: 10px;
+    border-radius: 3px;
+    border: 1px solid var(--tooltip-border-theme);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-size: x-small;
+    font-family: monospace;
+}
+
+.filterBox {
+    display: flex;
+    align-items: center;
+    margin-left: 1rem;
+    width: 100%;
+}
+
+input,
+button {
+    background-color: var(--input-background-theme);
+    color: var(--input-color-theme);
+    border: none;
+    padding: 8px;
+    margin-right: 5px;
+    border-radius: 4px;
+}
+
+input {
+    width: 100%;
+}
+
+input::placeholder {
+    color: var(--input-placeholder-color-theme);
+}
+
+button {
+    cursor: pointer;
+}
+
+.notSelectedButton {
+    background-color: var(--notSelectedButton-background-theme);
+}
+
+.selectedButton {
+    background-color: var(--selectedButton-background-theme);
+    box-shadow: #00000057 inset 2px 2px 3px 0px;
+}
+
+.topButton {
+    color: var(--top-button-color-theme);
+    border: none;
+    padding: 8px;
+    margin-right: 5px;
+    border-radius: 4px;
+    height: fit-content;
+    display: flex;
+    align-items: center;
+}
+
+.flamegraph {
+    background-color: var(--flamegraph-background-theme);
+    margin-top: 10px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+
+.threadName {
+    margin-top: 9px;
+    margin-bottom: 4px;
+}
+
+.threadFunction {
+    font-size: small;
+}
+
+h1,
+h2 {
+    color: var(--title-color-theme);
+}
+
+.hierarchicalView {
+    overflow: scroll;
+}
+
+li {
+    white-space: nowrap;
+}
+
+/* Remove default bullets */
+ul, .root {
+  list-style-type: none;
+}
+
+/* Remove margins and padding from the parent ul */
+.root {
+  margin: 0;
+  padding: 0;
+}
+
+/* Create the caret/arrow with a unicode, and style it */
+.caret::before {
+  content: "\25B6";
+  color: var(--caret-color-theme);
+  display: inline-block;
+  margin-right: 6px;
+}
+
+/* Rotate the caret/arrow icon when clicked on (using JavaScript) */
+.caret-down::before {
+  transform: rotate(90deg);
+}
+
+/* Hide the nested list */
+.nested {
+  display: none;
+}
+
+/* Show the nested list when the user clicks on the caret/arrow (with JavaScript) */
+.active {
+  display: block;
+}
+
+#startStop {
+  display: none;
+}
